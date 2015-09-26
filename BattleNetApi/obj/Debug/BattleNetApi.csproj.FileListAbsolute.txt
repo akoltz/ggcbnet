@@ -1,9 +1,0 @@
-C:\Users\Andrew Koltz\Documents\GGCharity\branches\andrew\BattleNetApi\bin\Debug\BattleNetApi.dll
-C:\Users\Andrew Koltz\Documents\GGCharity\branches\andrew\BattleNetApi\bin\Debug\BattleNetApi.pdb
-C:\Users\Andrew Koltz\Documents\GGCharity\branches\andrew\BattleNetApi\bin\Debug\Newtonsoft.Json.dll
-C:\Users\Andrew Koltz\Documents\GGCharity\branches\andrew\BattleNetApi\bin\Debug\Newtonsoft.Json.xml
-C:\Users\Andrew Koltz\Documents\GGCharity\branches\andrew\BattleNetApi\obj\Debug\BattleNetApi.dll
-C:\Users\Andrew Koltz\Documents\GGCharity\branches\andrew\BattleNetApi\obj\Debug\BattleNetApi.pdb
-C:\Users\Andrew Koltz\Documents\GGCharity\branches\andrew\BattleNetApi\obj\Debug\BattleNetApi.csprojResolveAssemblyReference.cache
-C:\Users\Andrew Koltz\Documents\GGCharity\branches\andrew\BattleNetApi\bin\Debug\LogCore.dll
-C:\Users\Andrew Koltz\Documents\GGCharity\branches\andrew\BattleNetApi\bin\Debug\LogCore.pdb
