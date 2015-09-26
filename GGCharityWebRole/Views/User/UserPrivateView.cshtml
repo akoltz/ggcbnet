@@ -1,0 +1,62 @@
+﻿@using GGCharityWebRole.ViewModels
+@model UserPrivateViewModel
+@{
+    ViewBag.Title = string.Format("{0}", Model.User.UserName);
+}
+
+@Html.ActionLink("Edit Profile", "EditProfile", "User")
+@Html.ActionLink("Manage Account", "Manage", "Account")
+@Html.ActionLink("View Public Profile", "Public")
+
+<h2>@Model.User.UserName</h2>
+@{
+    if (Model.MainEvent != null)
+    {
+        var eventPhase = Model.MainEvent.GetPhase();
+
+        if ((eventPhase == GGCharityData.EventPhase.Registration)
+                || (eventPhase == GGCharityData.EventPhase.Live))
+        {
+
+            if (Model.MainEventRegistration != null)
+            {
+                    <p>You're signed up to play in <a href="@Url.EventDetailsLink(Model.MainEvent)">@Model.MainEvent.Name</a> from @Model.MainEvent.LiveStart to @Model.MainEvent.EventEnd. </p>
+
+                    <p>Pledges Received</p>
+                if ((eventPhase != GGCharityData.EventPhase.Upcoming)
+                    && (Model.MainEventPledgesReceived.Count > 0))
+                {
+                    Html.RenderPartial("UserPledgeControl", new PledgeControlViewModel { Pledges = Model.MainEventPledgesReceived, ArePledgesForViewer = true, EventPhase = Model.MainEvent.GetPhase() });
+                }
+                else
+                {
+                    <p>You haven't received any pledges yet.  Share your <a href="@Url.PlayerProfilePublicLink(Model.User)">public profile page</a> with your friends and family!</p>
+                }
+            }
+
+            if (Model.InProgressEventData.MainEventPledgesMade.Count > 0)
+            {
+                <p>Your Pledges</p>
+                Html.RenderPartial("UserPledgeControl", new PledgeControlViewModel { Pledges = Model.InProgressEventData.MainEventPledgesMade, ArePledgesForViewer = false, EventPhase=Model.MainEvent.GetPhase() });
+            }
+            else if (eventPhase != GGCharityData.EventPhase.Complete)
+            {
+                <span> 
+                    <a href="@Url.EventDetailsLink(Model.MainEvent)">Click here</a> to find a player you know and make a pledge!
+                </span>
+            }
+        }
+        else if (eventPhase == GGCharityData.EventPhase.Complete)
+        {
+            <p>Pledges Made</p>
+            if (Model.CompleteEventData.PledgesByCharity.Count > 0)
+            {
+                Html.RenderPartial(@"PledgeSummaryControl", Model.CompleteEventData.PledgesByCharity);
+            }
+        }
+    }
+    
+    @Html.Partial("_UserGameListView", Model)
+    
+    <p>Did you add a new login but you don't see the game listed here?  @Html.ActionLink("Refresh Game List", "RefreshGames", "Account", new { returnUrl = Request.Url.PathAndQuery }, null)</p>
+}

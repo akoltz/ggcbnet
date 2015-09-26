@@ -1,0 +1,128 @@
+﻿@using GGCharityData
+@using GGCharityWebRole.ViewModels
+@using System.Collections.Generic
+@using System.Linq
+
+<script>
+
+    function UpdatePledgeStatus(CharityId, EventId, Receiver) {
+
+        var urlString = "/pledge/Complete?eventId=" + EventId + "&charityId=" + CharityId + "&receiver=" + Receiver;
+
+        if ($("#completed_check_box" + CharityId).is(":checked")) {
+            $.ajax({
+                url: urlString + "&complete=true",
+                cache: false,
+                type: "POST"
+            }).done(function (html) {
+                $("#pledge_summary_group" + CharityId).addClass("pledge_summary_group_completed", 250);
+                $("#pledge_summary_group" + CharityId).removeClass("pledge_summary_group_incomplete", 250);
+            });
+        } else {
+            $.ajax({
+                url: urlString + "&complete=false",
+                cache: false,
+                type: "POST"
+            }).done(function (html) {
+                $("#pledge_summary_group" + CharityId).removeClass("pledge_summary_group_completed", 250);
+                $("#pledge_summary_group" + CharityId).addClass("pledge_summary_group_incomplete", 250);
+            });
+        }
+    }
+
+    //$(document).ready(function () {
+    //    $(".pledge_summary_checkbox").click(function (sender)
+    //    {
+    //        if ($("#CheckBox" + CharityId).is(":checked")) {
+    //            $.ajax({
+    //                url: "/pledge/CompletePledges?UserId= " + UserId + "&CharityId=" + CharityId,
+    //                cache: false,
+    //                complete: GetPledgeDetailsComplete,
+    //                error: GetPledgeDetailsError,
+    //                type: "POST"
+    //            }).done(function (html) {
+    //                $("#PledgeView" + CharityId).addClass("PledgeSummaryCompleted", 250);
+    //                $("#PledgeView" + CharityId).removeClass("PledgeSummaryIncomplete", 250);
+    //            });
+    //        } else {
+    //            $.ajax({
+    //                url: "/pledge/UndoCompletePledges?UserId= " + UserId + "&CharityId=" + CharityId,
+    //                cache: false,
+    //                complete: GetPledgeDetailsComplete,
+    //                error: GetPledgeDetailsError,
+    //                type: "POST"
+    //            }).done(function (html) {
+    //                $("#PledgeView" + CharityId).addClass("PledgeSummaryIncomplete", 250);
+    //                $("#PledgeView" + CharityId).removeClass("PledgeSummaryCompleted", 250);
+    //            });
+    //        }
+    //    });
+    //});
+</script>
+
+@model List<IGrouping<Charity, Pledge>>
+<div class="pledge_summary_control">
+@{
+    foreach (var group in Model)
+    {
+        <div class="pledge_summary_group @(group.All(p => p.PledgeCompleted) ? "pledge_summary_group_completed" : "pledge_summary_group_incomplete")" id="pledge_summary_group@(group.Key.Id)">
+            <a class="pledge_summary_title" href="@group.Key.Website">@group.Key.Name</a>
+            <p class="pledge_summary_total">Total Pledged: $@group.Sum(p => p.AmountOwed)</p>
+            <p class="pledge_summary_description">Visit the link above to complete your pledge. When you're done, mark it complete to let the players know!</p>
+            <p class="pledge_summary_completed">
+                <input type="checkbox"
+                       class="pledge_summary_checkbox"
+                       id="completed_check_box@(group.Key.Id)"
+                       @(group.All(p => p.PledgeCompleted) ? "checked " : " ")
+                       value="@(group.Key.Id)"
+                       onclick="UpdatePledgeStatus('@group.Key.Id', '@group.First().EventId', '@group.First().Receiver.UserId')" />
+
+                Pledge Completed
+            </p>
+
+            @{
+        List<GridColumn> columns = new List<GridColumn>();
+        columns.Add(new GridColumn(
+            Header: "Player",
+            Format:@<text>@item.Receiver.User.UserName</text>
+        ));
+
+        columns.Add(new GridColumn(
+            Header: "Amount per win",
+            Format:@<text>$@item.AmountPerWin</text>,
+                Style: "grid_column_style right_aligned"
+                ));
+
+        columns.Add(new GridColumn(
+            Header: "Wins",
+            Format:@<text>@Html.Partial("ProgressBar",
+                    new GGCharityWebRole.ViewModels.ProgressBarViewModel
+                    {
+                        Progress = (int)item.Receiver.WinsAchieved,
+                        Total = (int)item.PledgeTimeWinsGoal,
+                        Text = String.Format("{0} / {1} wins", item.Receiver.WinsAchieved, item.PledgeTimeWinsGoal),
+                         ProgressClass = "pledge_summary_progress"
+                    })</text>
+            ));
+
+        columns.Add(new GridColumn(
+            Header: "Total",
+            Format:@<text>$@item.AmountOwed</text>,
+                Style: "grid_column_style right_aligned"
+            ));
+
+        GridViewModel grid = new GridViewModel(
+            GridName: "PledgeSummaryGrid",
+            DefaultSort: "User.Username",
+            Elements: group.ToList(),
+            ColumnFormats: columns,
+            PageSize: group.Count(),
+            TotalElements: group.Count()
+            );
+
+            @Html.Partial("GGCharityGrid", grid)
+            }
+        </div>
+    }
+}
+</div>

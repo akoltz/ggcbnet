@@ -1,0 +1,54 @@
+﻿@using GGCharityWebRole.ViewModels
+@using GGCharityCore
+@model StreamingPlayerInfo
+
+@if (Config.Get().UseTestStreams)
+{
+    <script>
+        function loadStream(twitchName) {
+            $("#VideoContainer").replaceWith("\
+            <div id=\"VideoContainer\" style=\"height:363px; width:620px; top:0px; padding-top:10px; margin-bottom:10px; background-color:black\"> \
+            Test stream for " + twitchName + "\
+            </div>");
+        }
+    </script>
+}
+else
+{
+    <script>
+        function loadStream(twitchName) {
+            $("#VideoContainer").replaceWith("\
+            <div id=\"VideoContainer\" style=\"height:363px; width:620px; top:0px; padding-top:10px; margin-bottom:10px; background-color:black\"> \
+            <object type=\"application/x-shockwave-flash\" height=\"363\" width=\"620\" id=\"live_embed_player_flash\" data=\"http://www.twitch.tv/widgets/live_embed_player.swf?channel=" + twitchName + "\" bgcolor=\"#000000\"> \
+                <param name=\"allowFullScreen\" value=\"true\" /> \
+                <param name=\"allowScriptAccess\" value=\"always\" /> \
+                <param name=\"allowNetworking\" value=\"all\" /> \
+                <param name=\"movie\" value=\"http://www.twitch.tv/widgets/live_embed_player.swf\" /> \
+                <param name=\"flashvars\" value=\"hostname=www.twitch.tv&channel=" + twitchName + "&auto_play=true&start_volume=0\" /> \
+            </object></div>");
+        }
+    </script>
+}
+<center>
+    <div id="home-video" style="height:363px; width:620px; top:0px; padding-top:10px; margin-bottom:50px; background-color:black">
+        @if (Config.Get().UseTestStreams)
+        {
+            @* If test streams are on, just show a black box at the top to show where it
+                will fit in the layout *@
+
+            <div id="VideoContainer">@Model.Username test stream</div>
+        }
+        else
+        {
+            <div id="VideoContainer" style="height:363px; width:620px; top:0px; padding-top:10px; margin-bottom:10px; background-color:black">
+                <object type="application/x-shockwave-flash" height="363" width="620" id="live_embed_player_flash" data="http://www.twitch.tv/widgets/live_embed_player.swf?channel=@Model.StreamUserName&bgcolor=#000000">
+                    <param name="allowFullScreen" value="true" />
+                    <param name="allowScriptAccess" value="always" />
+                    <param name="allowNetworking" value="all" />
+                    <param name="movie" value="http://www.twitch.tv/widgets/live_embed_player.swf" />
+                    <param name="flashvars" value="hostname=www.twitch.tv&channel=@Model.StreamUserName&auto_play=true&start_volume=0" />
+                </object>
+            </div>
+        }
+    </div>
+</center>

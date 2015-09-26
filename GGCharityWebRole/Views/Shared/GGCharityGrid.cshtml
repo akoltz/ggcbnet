@@ -1,0 +1,39 @@
+﻿@model GridViewModel
+
+@{
+    var grid = new WebGrid(
+        source: null,
+        rowsPerPage: Model.PageSize,
+        ajaxUpdateContainerId: string.Format("{0}Container", Model.GridName),
+        ajaxUpdateCallback: string.Format("{0}Callback", Model.GridName),
+        fieldNamePrefix: Model.GridName,
+        canSort: false,
+        defaultSort: Model.DefaultSort
+        ).Bind(
+            source: Model.Elements,
+            autoSortAndPage: false,
+            rowCount: Model.TotalElements);
+
+    var webGridColumns = new List<WebGridColumn>();
+    foreach (var columnFormat in Model.ColumnFormats)
+    {
+        webGridColumns.Add(
+            grid.Column(
+                    style: (String.IsNullOrEmpty(columnFormat.Style) ? "grid_column_style" : columnFormat.Style),
+                    header: columnFormat.Header,
+                    format: columnFormat.Format
+            ));
+    }
+}
+
+<script>
+    function @{@Model.GridName}Callback() {
+    }
+</script>
+<div id="@{@Model.GridName}Container">
+    @grid.GetHtml(
+        rowStyle: "grid_row_style",
+        alternatingRowStyle: "alt_grid_row_style",
+        columns: webGridColumns
+    )
+</div>

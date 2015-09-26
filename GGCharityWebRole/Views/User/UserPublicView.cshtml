@@ -1,0 +1,61 @@
+﻿@model GGCharityWebRole.ViewModels.UserPublicViewModel
+@{
+    ViewBag.Title = string.Format("{0}'s Profile", Model.User.UserName);
+}
+
+<h2>@ViewBag.Title</h2>
+@if (Model.MainEvent != null)
+{
+    var registration = Model.MainEventRegistration;
+    if (registration != null)
+    {
+        <span>@Model.User.UserName is playing in <a href="@Url.EventDetailsLink(Model.MainEvent)">@Model.MainEvent.Name</a>.  It starts on @Model.MainEvent.LiveStart!</span>
+        // Show details for the user's event participation: game, charity, pledge button, pledges received, stream (if applicable)
+        if (Model.MainEvent.GetPhase() == GGCharityData.EventPhase.Live)
+        {
+            <span>Event is live!</span>
+            @*Show progress bar*@
+            <p>Wins achieved: @Model.MainEventRegistration.WinsAchieved / @Model.MainEventRegistration.WinsGoal</p>   
+        }
+        
+        if ((Model.MainEvent.GetPhase() == GGCharityData.EventPhase.Live 
+                || Model.MainEvent.GetPhase() == GGCharityData.EventPhase.Registration))
+        {
+            if (Model.ViewerPledge == null)
+            { 
+                @*Show pledge button*@
+                <a href="@Url.PledgeCreateLink(Model.MainEventRegistration)">Click here to make a pledge &raquo;</a>
+            }
+            else
+            {
+                <span>You have pledged $@Model.ViewerPledge.AmountPerWin for each of @Model.Username's wins</span>
+                <a href="@Url.PledgeDeleteLink(Model.ViewerPledge, Url.Action("Index", "User", new { Id = Model.Username }))">Cancel Pledge &raquo;</a>
+            }
+        }
+    }
+}
+
+@if (Model.Stream != null)
+{
+    <h2>Watch @Model.Username Live</h2>
+    @*Embed stream*@
+    Html.RenderPartial("Stream", Model.Stream);
+}
+
+@*Show past event and general profile information*@
+<h2>Past Events</h2>
+@foreach (var registration in Model.User.EventRegistrations)
+{
+    if (registration == Model.MainEventRegistration
+        || registration.Event.GetPhase() != GGCharityData.EventPhase.Complete)
+    {
+        continue;
+    }
+    
+    <a href="@Url.Action("Details", "Event", new {id = registration.EventId})">
+        <img src="@registration.Event.IconUrl" height="128" width="128"/>
+        @registration.Event.Name
+    </a>    
+}
+
+@Html.Partial("_UserGameListView", Model)

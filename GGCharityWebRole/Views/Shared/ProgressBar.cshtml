@@ -1,0 +1,5 @@
+﻿@model GGCharityWebRole.ViewModels.ProgressBarViewModel
+
+<div class="progress @Model.ProgressClass">
+    <div class="progress-bar @Model.ProgressBarClass" style="width:@{@(Model.Progress*100/(Model.Total > 0 ? Model.Total : 1))}%">@Model.Text</div>
+</div>

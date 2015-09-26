@@ -1,0 +1,6 @@
+﻿@model GGCharityWebRole.ViewModels.EventViewModel
+
+<h1><img src="@Model.Event.IconUrl" width="128" height="128" />@Model.Event.WelcomeString</h1>
+<span class="label"><a href="@Model.Event.Game.Website">@Model.Event.Game.Name</a></span>
+<p class="lead">Registration starts on @Html.TimeInUserTimeZone(Model.Event.RegistrationStart).  Play from @Html.TimeInUserTimeZone(Model.Event.LiveStart) to @Html.TimeInUserTimeZone(Model.Event.EventEnd)</p>
+<p><a href="@Url.Action("Details", "Event", new { Id=@Model.Id, Slug=Model.Event.GetSlug() })" class="btn btn-primary btn-lg">Details &raquo;</a></p>

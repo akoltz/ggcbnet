@@ -1,0 +1,105 @@
+﻿@if (GGCharityCore.Config.Get().InDevelopmentEnvironment)
+{
+    <script>
+    $(document).ready(function () {
+        $("#button_showDevPanel").click(function () {
+            $("#debug_panel_contents").show();
+            $.ajax({
+                url: "/Dev/AjaxShowDebugPanel",
+                cache: false
+            });
+        });
+
+        $("#button_closeDevPanel").click(function () {
+            $("#debug_panel_contents").hide();
+            $.ajax({
+                url: "/Dev/AjaxHideDebugPanel",
+                cache: false
+            });
+        });
+
+        $("#button_reset_db").click(function () {
+            $(".debug_loading_gif").show();
+        });
+
+        @if (!GGCharitySession.Get().EnableDebugPanel)
+        {
+            <text>
+            $("#debug_panel_contents").hide();
+            </text>
+        }
+    });
+    </script>
+
+    <div id="debug_panel" class="debug_panel">
+        <a href="#" class="debug_panel_button" id="button_showDevPanel">[...]</a> 
+        <a href="#" class="debug_panel_button" id="button_closeDevPanel">[X]</a>
+        <div id="debug_panel_contents">
+            <div class="debug_effective_time_panel">
+                Current Actual Time (UTC)=@DateTime.UtcNow
+                @{
+                    using(Html.BeginForm("SetTime", "Dev", FormMethod.Post))
+                    {
+                        <input type="hidden" value="@Request.Url.AbsolutePath" name="returnUrl" />
+                        <input type="datetime" value="@GGCharitySession.Get().EffectiveTime" name="newTime" />
+                        <input type="submit" value="Set Time" />
+                    }
+                }
+            </div>
+            <div class="debug_buttons_container">
+                @{
+                    using (Html.BeginForm("ClearCache", "Dev", FormMethod.Post))
+                    {
+                        <input type="hidden" value="@Request.Url.AbsolutePath" name="returnUrl" />
+                        <input type="submit" value="Clear Page Cache" />
+                    }
+                    using(Html.BeginForm("SwitchAccounts","Account", FormMethod.Post))
+                    {
+                        <input type="hidden" value="Bey" name="username" />
+                        <input type="hidden" value="@Request.Url.AbsolutePath" name="returnUrl" />
+                        <input type="submit" value="Login as Bey" />
+                    }
+                    using (Html.BeginForm("SwitchAccounts", "Account", FormMethod.Post))
+                    {
+                        <input type="hidden" value="imaznation" name="username" />
+                        <input type="hidden" value="@Request.Url.AbsolutePath" name="returnUrl" />
+                        <input type="submit" value="Login as imaznation" />
+                    }
+                <img class="debug_loading_gif" id="debug_loading_gif" src="~/Content/loading.gif" />
+                    using (Html.BeginForm("ResetDb", "Dev", FormMethod.Post))
+                    {
+                        <input type="hidden" value="@Request.Url.AbsolutePath" name="returnUrl" />
+                        <input type="submit" id="button_reset_db" value="Reset DB" />
+                    }
+
+                    using (Html.BeginForm("ClearDb", "Dev", FormMethod.Post))
+                    {
+                        <input type="hidden" value="@Request.Url.AbsolutePath" name="returnUrl" />
+                        <input type="submit" id="button_reset_db" value="Clear DB" />
+                    }
+
+                    using (Html.BeginForm("StartBackgroundWorker", "Dev", FormMethod.Post))
+                    {
+                        <input type="hidden" value="@Request.Url.AbsolutePath" name="returnUrl" />
+                        <input type="submit" id="button_reset_db" value="Start Background Work" />
+                    }
+}
+            </div>
+            @Html.ActionLink("Events", "Index", "Event", new { area = "admin" }, new { })
+            @Html.ActionLink("Games", "Index", "Games", new { area = "admin" }, new { })
+            @Html.ActionLink("Charities", "Index", "Charity", new { area = "admin" }, new { })
+            @Html.ActionLink("Users", "Index", "Users", new { area = "admin" }, new { })
+            @Html.ActionLink("Tasks", "Index", "Tasks", new { area = "admin" }, new { })
+            <div class="debug_details" id="debug_details_panel">
+                <h3>Debug Details</h3>
+                <ul>@{
+                        foreach(var entry in ViewBag.UserOperation.Details)
+                        {
+                            <li><span class="debug_details_key">@entry.Key</span> => <span class="debug_details_value">@entry.Value</span></li>
+                        }
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+}

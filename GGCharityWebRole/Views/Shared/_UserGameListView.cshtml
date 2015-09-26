@@ -1,0 +1,18 @@
+﻿@model GGCharityWebRole.ViewModels.UserViewModel
+
+<h2>@Model.User.UserName's Games</h2>
+@foreach (var game in Model.GameProfiles)
+{
+    if (game.WebProfileUrl != null)
+    {
+        <text>
+            <a href="@game.WebProfileUrl" class="UserProfileGameLink">
+                <img src="@Model.GameIconUrls[game.GameId]" class="UserProfileGameIcon" />
+            </a>
+        </text>
+    }
+    else
+    {
+        <img src="@Model.GameIconUrls[game.GameId]" class="UserProfileGameIcon" />
+    }
+}

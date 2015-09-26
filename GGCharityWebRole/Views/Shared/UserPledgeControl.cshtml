@@ -1,0 +1,94 @@
+﻿@using GGCharityData
+@using GGCharityWebRole.ViewModels
+@model GGCharityWebRole.ViewModels.PledgeControlViewModel
+@{
+    List<GridColumn> columns = new List<GridColumn>();
+
+    if (Model.ArePledgesForViewer)
+    {
+        columns.Add(new GridColumn(
+            Header: "Donor",
+            Format: @<text><a href="@Url.PlayerProfileLink((GGCharityUser)item.Donor)">@item.Donor.UserName</a></text>)
+        );
+    }
+    else
+    {
+        columns.Add(new GridColumn(
+            Header: "Player",
+            Format: @<text><a href="@Url.PlayerProfileLink((GGCharityUser)item.Receiver.User)">@item.Receiver.User.UserName</a></text>)
+        );
+    }
+    
+    columns.Add(new GridColumn(
+        Header: "Amount",
+        Format:@<text>$@item.AmountPerWin.ToString("F") per win</text>)
+    );
+
+    if (Model.EventPhase == EventPhase.Registration
+        || Model.ArePledgesForViewer)
+    { 
+        columns.Add(new GridColumn(
+            Header: "Goal",
+            Format:@<text>@item.PledgeTimeWinsGoal wins</text>)
+        );
+
+        columns.Add(new GridColumn(
+            Header: "Total",
+            Format:@<text>up to $@item.Amount.ToString("F")</text>)
+        );
+    }
+    else if (Model.EventPhase == EventPhase.Live
+             || Model.EventPhase == EventPhase.Complete)
+    {
+        columns.Add(new GridColumn(
+            Header: "Player's Progress",
+            Format:@<text>@Html.Partial("ProgressBar", new ProgressBarViewModel { Progress = item.Receiver.WinsAchieved, Total = item.PledgeTimeWinsGoal })</text>)
+        );
+
+        columns.Add(new GridColumn(
+            Header: "Total",
+            Format:@<text>$@(item.Receiver.WinsAchieved == item.PledgeTimeWinsGoal ? item.Amount : (item.Receiver.WinsAchieved * item.AmountPerWin))</text>)
+        );
+    }
+
+    if (Model.EventPhase != EventPhase.Complete)
+    { 
+        string actionString;
+        if (Model.ArePledgesForViewer)
+        {
+            actionString = "Delete";
+            columns.Add(new GridColumn(
+                 Header: "",
+                 Format:@<text><a href="@UrlHelperExtensions.PledgeDeleteLink(Url, item, Url.Action("Index", "User"))">@actionString &raquo;</a></text>)
+            );
+        }
+        else
+        {
+            actionString = "Cancel";
+            columns.Add(new GridColumn(
+                Header: "",
+                Format:@<text><a href="@UrlHelperExtensions.PledgeDeleteLink(Url, item, Url.Action("Index", "User"))">@actionString &raquo;</a></text>)
+            );
+        }
+    }
+    else 
+    {
+        if (Model.ArePledgesForViewer)
+        {
+            columns.Add(new GridColumn(
+                Header: "Status",
+                Format:@<text>@(item.PledgeCompleted ? "Complete" : "Not Complete")</text>
+                ));
+        }
+    }
+
+    GridViewModel grid = new GridViewModel(
+         GridName: "EventPlayerGrid",
+         DefaultSort: "User.Username",
+         Elements: Model.Pledges,
+         ColumnFormats: columns,
+         PageSize: Model.Pledges.Count,
+         TotalElements: Model.Pledges.Count
+     );
+}
+@Html.Partial("GGCharityGrid", grid)

@@ -1,0 +1,20 @@
+﻿@*
+    Takes a list of players that are actively streaming.  This control first displays the stream
+    of the first player in the list, centered and at the top.  Following this is a grid of buttons, 
+    one for each player.  Clicking the button replaces the currently active stream with that of
+    the player that was selected.  Primary uses for this are on the home page and on the 
+    main event page.  For the player's profile page, directly use the stream control (since there's
+    only one option there).
+*@
+@using GGCharityWebRole.ViewModels
+@model IEnumerable<StreamingPlayerInfo>
+
+@if (Model.FirstOrDefault() != null)
+{ 
+    @Html.Partial("Stream", Model.First())
+}
+
+@foreach(var player in Model)
+{
+    <div class="btn btn-primary btn-lg player_stream_button" onclick="javascript:loadStream('@player.StreamUserName');">@player.Username</div>
+}

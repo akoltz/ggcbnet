@@ -1,0 +1,17 @@
+﻿
+@{
+    ViewBag.Title = "Connect StarCraft Account";
+}
+
+<h2>@ViewBag.Title.</h2>
+<p>Connect a @ViewBag.GameName account to play in GGCharity events!</p>
+
+@if (ViewBag.GameId == GGCharityData.GameID.StarCraft)
+{
+    @Html.Partial("_AddStarCraftAccount");
+}
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
